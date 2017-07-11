@@ -30,7 +30,7 @@ server <- function(input, output) {
    
   output$plot <- renderPlot({
     # plot object with a null data item
-    p <- ggplot(data = data.frame(x = 0), mapping = aes(x = x))
+    p <- ggplot(data = data.frame(x2= 0), mapping = aes(x = x2))
      
     # define the bounding functions
     f1 <- function(x) {
