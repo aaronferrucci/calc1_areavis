@@ -1,14 +1,15 @@
-
 library(shiny)
 library(ggplot2)
 
-# Define UI for application that draws a histogram
+source("bounds.R")
+
+# Define UI
 ui <- fluidPage(
    
    # Application title
    titlePanel("Visualizing a Riemann Sum"),
    
-   # Sidebar with a slider input for number of bins 
+   # Sidebar with a slider input for number of rectangles 
    sidebarLayout(
       sidebarPanel(
          sliderInput("rects",
@@ -18,7 +19,7 @@ ui <- fluidPage(
                      value = 31)
       ),
       
-      # Show a plot of the generated distribution
+      # Show the graph
       mainPanel(
          plotOutput("plot")
       )
@@ -32,18 +33,9 @@ server <- function(input, output) {
     # plot object with a null data item
     p <- ggplot(data = data.frame(x2= 0), mapping = aes(x = x2))
      
-    # define the bounding functions
-    f1 <- function(x) {
-      return(sqrt(x))
-    }
-    f2 <- function(x) {
-      return(x^2)
-    }
     n = input$rects
     
     # Compute the rectangle bounds and the approximating area
-    xmin <- 0
-    xmax <- 1
     w <- (xmax - xmin) / n
     x1 <- xmin + c(0:(n-1)) * w
     x2 <- x1 + w
@@ -54,8 +46,8 @@ server <- function(input, output) {
     area <- sum((rects$x2 - rects$x1) * (rects$y2 - rects$y1))
     
     # Plot the functions
-    p2 <- p + scale_x_continuous(limits=c(0, 1.1)) + stat_function(fun=f1) + stat_function(fun=f2) +
-      ggtitle(bquote(Area~between~x^2~and~sqrt(x)~is~approximately~.(area))) + guides(fill=F)
+    p2 <- p + scale_x_continuous(limits=c(xmin, xmax + 0.1)) + stat_function(fun=f1) + stat_function(fun=f2) +
+      ggtitle(bquote(Area~between~f1~and~f2~is~approximately~.(area))) + guides(fill=F)
     # final plot with rectangles
     p2 + geom_rect(data=rects, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2, fill=t), color="black", alpha=0.5)
   })
@@ -63,4 +55,3 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-
